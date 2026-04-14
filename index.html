@@ -1,951 +1,1210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Raksha Ramteke — Senior Ruby on Rails Developer</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
-<style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --surface2: #1a1a24;
-    --accent: #6c63ff;
-    --accent2: #ff6b6b;
-    --accent3: #43e97b;
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --border: rgba(108,99,255,0.15);
-    --glow: rgba(108,99,255,0.3);
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    line-height: 1.7;
-    overflow-x: hidden;
-  }
-
-  /* Noise texture overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.4;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 1.2rem 4rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(10,10,15,0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    letter-spacing: -0.02em;
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .nav-logo span { color: var(--accent); }
-
-  .nav-links {
-    display: flex;
-    gap: 2.5rem;
-    list-style: none;
-  }
-
-  .nav-links a {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-decoration: none;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--accent); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: 8rem 4rem 4rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 60% 40%, rgba(108,99,255,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(67,233,123,0.05) 0%, transparent 50%);
-  }
-
-  .hero-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 900px;
-  }
-
-  .hero-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--accent);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-    padding: 0.4rem 1rem;
-    border: 1px solid rgba(108,99,255,0.3);
-    border-radius: 2rem;
-    background: rgba(108,99,255,0.05);
-  }
-
-  .hero-tag::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent3);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .hero-name {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(3rem, 8vw, 6.5rem);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin-bottom: 1.5rem;
-  }
-
-  .hero-name .line2 {
-    display: block;
-    color: transparent;
-    -webkit-text-stroke: 1.5px rgba(108,99,255,0.5);
-  }
-
-  .hero-title {
-    font-family: 'DM Mono', monospace;
-    font-size: 1rem;
-    color: var(--accent);
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.05em;
-  }
-
-  .hero-desc {
-    font-size: 1.05rem;
-    color: var(--muted);
-    max-width: 580px;
-    line-height: 1.8;
-    margin-bottom: 3rem;
-  }
-
-  .hero-desc strong { color: var(--text); font-weight: 500; }
-
-  .hero-cta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.85rem 2rem;
-    background: var(--accent);
-    color: #fff;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(108,99,255,0.4);
-  }
-
-  .btn-outline {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.85rem 2rem;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: all 0.2s;
-  }
-
-  .btn-outline:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    transform: translateY(-2px);
-  }
-
-  .hero-stats {
-    position: absolute;
-    right: 4rem;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    z-index: 2;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    min-width: 140px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-  }
-
-  .stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 0.3rem;
-  }
-
-  .stat-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* SECTIONS */
-  section { padding: 6rem 4rem; }
-
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--accent);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    max-width: 60px;
-    height: 1px;
-    background: var(--accent);
-    opacity: 0.3;
-  }
-
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 3rem;
-    line-height: 1.1;
-  }
-
-  /* SKILLS */
-  .skills-section { background: var(--surface); }
-
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .skill-group {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.8rem;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-
-  .skill-group:hover {
-    border-color: rgba(108,99,255,0.4);
-    transform: translateY(-3px);
-  }
-
-  .skill-group-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--accent);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-
-  .skill-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .skill-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    padding: 0.3rem 0.75rem;
-    border-radius: 4px;
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    letter-spacing: 0.03em;
-  }
-
-  /* EXPERIENCE */
-  .exp-timeline { position: relative; }
-
-  .exp-timeline::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, var(--accent), transparent);
-    opacity: 0.2;
-  }
-
-  .exp-item {
-    padding-left: 2.5rem;
-    margin-bottom: 4rem;
-    position: relative;
-  }
-
-  .exp-item::before {
-    content: '';
-    position: absolute;
-    left: -4px; top: 8px;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 2px solid var(--bg);
-    box-shadow: 0 0 12px var(--glow);
-  }
-
-  .exp-meta {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-  }
-
-  .exp-role {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-
-  .exp-period {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--accent);
-    padding: 0.25rem 0.75rem;
-    border: 1px solid rgba(108,99,255,0.2);
-    border-radius: 2rem;
-    white-space: nowrap;
-  }
-
-  .exp-company {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-bottom: 1.2rem;
-  }
-
-  .exp-project {
-    margin-bottom: 1.2rem;
-  }
-
-  .exp-project-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--accent2);
-    letter-spacing: 0.08em;
-    margin-bottom: 0.6rem;
-    text-transform: uppercase;
-  }
-
-  .exp-bullets {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .exp-bullets li {
-    font-size: 0.9rem;
-    color: var(--muted);
-    padding-left: 1.2rem;
-    position: relative;
-    line-height: 1.6;
-  }
-
-  .exp-bullets li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 0.75rem;
-  }
-
-  .exp-bullets li strong { color: var(--text); font-weight: 500; }
-
-  /* HIGHLIGHTS */
-  .highlights-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .highlight-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-  }
-
-  .highlight-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(108,99,255,0.4);
-  }
-
-  .highlight-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 80px; height: 80px;
-    background: radial-gradient(circle, var(--glow), transparent 70%);
-    border-radius: 50%;
-  }
-
-  .highlight-icon {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-
-  .highlight-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-
-  .highlight-desc {
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  /* CONTACT */
-  .contact-section {
-    background: var(--surface);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .contact-section::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(108,99,255,0.06), transparent 70%);
-    border-radius: 50%;
-  }
-
-  .contact-links {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    margin-top: 2.5rem;
-    position: relative;
-  }
-
-  .contact-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.85rem 1.8rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    text-decoration: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-    background: var(--bg);
-  }
-
-  .contact-link:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(108,99,255,0.15);
-  }
-
-  /* AWARDS */
-  .awards-row {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .award-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 1.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    flex: 1;
-    min-width: 260px;
-  }
-
-  .award-icon { font-size: 1.5rem; }
-
-  .award-text { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
-  .award-text strong { color: var(--text); font-weight: 500; display: block; }
-
-  /* FADE IN */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-  /* FOOTER */
-  footer {
-    padding: 2rem 4rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  footer p {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-  }
-
-  @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { display: none; }
-    .hero { padding: 7rem 1.5rem 3rem; }
-    .hero-stats { display: none; }
-    section { padding: 4rem 1.5rem; }
-    footer { padding: 1.5rem; }
-  }
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">RR<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#highlights">Highlights</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<section class="hero" id="about">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-
-  <div class="hero-content fade-in">
-    <div class="hero-tag">Available for opportunities</div>
-    <h1 class="hero-name">
-      Raksha<br/>
-      <span class="line2">Ramteke</span>
-    </h1>
-    <p class="hero-title">// Senior Ruby on Rails Developer</p>
-    <p class="hero-desc">
-      <strong>6+ years</strong> building production-grade web applications at scale.
-      Deep expertise in <strong>REST APIs, GraphQL, Docker, PostgreSQL & Redis</strong>.
-      Proven track record in microservices, CI/CD pipelines, and TDD/BDD workflows.
-      Hands-on LLM trainer for <strong>Claude, GPT-4 & Gemini</strong> via Turing.
-    </p>
-    <div class="hero-cta">
-      <a href="mailto:raksha.ramteke98@gmail.com" class="btn-primary">↗ Get in Touch</a>
-      <a href="https://linkedin.com/in/raksha-ramteke-2900a5152" target="_blank" class="btn-outline">LinkedIn</a>
-      <a href="https://github.com/Raksha22" target="_blank" class="btn-outline">GitHub</a>
-    </div>
-  </div>
-
-  <div class="hero-stats">
-    <div class="stat-card fade-in">
-      <div class="stat-num">6+</div>
-      <div class="stat-label">Years Exp</div>
-    </div>
-    <div class="stat-card fade-in">
-      <div class="stat-num">40%</div>
-      <div class="stat-label">Sidekiq Optimised</div>
-    </div>
-    <div class="stat-card fade-in">
-      <div class="stat-num">300+</div>
-      <div class="stat-label">PRs Reviewed</div>
-    </div>
-    <div class="stat-card fade-in">
-      <div class="stat-num">90%+</div>
-      <div class="stat-label">Test Coverage</div>
-    </div>
-  </div>
-</section>
-
-<!-- SKILLS -->
-<section class="skills-section" id="skills">
-  <div class="section-label">Technical Stack</div>
-  <h2 class="section-title">What I Work With</h2>
-  <div class="skills-grid">
-    <div class="skill-group fade-in">
-      <div class="skill-group-label">Languages & Frameworks</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Ruby on Rails</span>
-        <span class="skill-tag">Ruby</span>
-        <span class="skill-tag">JavaScript</span>
-        <span class="skill-tag">TypeScript</span>
-        <span class="skill-tag">Angular</span>
-        <span class="skill-tag">jQuery</span>
-      </div>
-    </div>
-    <div class="skill-group fade-in">
-      <div class="skill-group-label">APIs & Integration</div>
-      <div class="skill-tags">
-        <span class="skill-tag">GraphQL</span>
-        <span class="skill-tag">REST APIs</span>
-        <span class="skill-tag">Twilio</span>
-        <span class="skill-tag">Google Maps</span>
-        <span class="skill-tag">Google Pub/Sub</span>
-        <span class="skill-tag">FCM</span>
-        <span class="skill-tag">APNs</span>
-      </div>
-    </div>
-    <div class="skill-group fade-in">
-      <div class="skill-group-label">Databases</div>
-      <div class="skill-tags">
-        <span class="skill-tag">PostgreSQL</span>
-        <span class="skill-tag">MySQL</span>
-        <span class="skill-tag">SQLite</span>
-        <span class="skill-tag">Redis</span>
-      </div>
-    </div>
-    <div class="skill-group fade-in">
-      <div class="skill-group-label">DevOps & Cloud</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Docker</span>
-        <span class="skill-tag">AWS ECS</span>
-        <span class="skill-tag">AWS S3</span>
-        <span class="skill-tag">ECR</span>
-        <span class="skill-tag">GitHub Actions</span>
-        <span class="skill-tag">Heroku</span>
-        <span class="skill-tag">Capistrano</span>
-        <span class="skill-tag">CI/CD</span>
-      </div>
-    </div>
-    <div class="skill-group fade-in">
-      <div class="skill-group-label">Testing</div>
-      <div class="skill-tags">
-        <span class="skill-tag">RSpec</span>
-        <span class="skill-tag">Capybara</span>
-        <span class="skill-tag">TDD</span>
-        <span class="skill-tag">BDD</span>
-      </div>
-    </div>
-    <div class="skill-group fade-in">
-      <div class="skill-group-label">Architecture</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Microservices</span>
-        <span class="skill-tag">API-First Design</span>
-        <span class="skill-tag">RBAC</span>
-        <span class="skill-tag">Multi-Tenant</span>
-        <span class="skill-tag">Sidekiq</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- EXPERIENCE -->
-<section id="experience">
-  <div class="section-label">Career</div>
-  <h2 class="section-title">Experience</h2>
-  <div class="exp-timeline">
-
-    <!-- Turing -->
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-role">Senior Software Developer</div>
-        <div class="exp-period">Jul 2025 – Mar 2026</div>
-      </div>
-      <div class="exp-company">Giantsminds Solutions (Client: Turing — LLM R&D) · Dallas, USA</div>
-      <ul class="exp-bullets">
-        <li>Served as <strong>POD Lead & LLM Trainer</strong> benchmarking Claude, GPT-4, and Gemini for coding ability and STEM reasoning.</li>
-        <li>Designed bug-injection tasks across <strong>50+ GitHub repositories</strong> to advance model capabilities.</li>
-        <li>Built validation tooling in Rails reducing manual QA overhead by <strong>~30%</strong>.</li>
-        <li>Recognised as <strong>Highest-Rated LLM Trainer</strong> for evaluation quality and throughput.</li>
-        <li>Led peer code reviews and managed TAIGA task board for a team of 6 trainers.</li>
-      </ul>
-    </div>
-
-    <!-- DispatchTrack -->
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-role">Senior Full Stack Developer</div>
-        <div class="exp-period">Feb 2024 – Jun 2025</div>
-      </div>
-      <div class="exp-company">DispatchTrack India Pvt. Ltd · Hyderabad, IN</div>
-      <ul class="exp-bullets">
-        <li>Owned full-stack development of a last-mile delivery SaaS platform serving <strong>high-throughput logistics operations</strong> at scale.</li>
-        <li>Optimised Sidekiq pipeline cutting processing time by <strong>40%</strong> via job batching, Redis tuning & concurrency config.</li>
-        <li>Led migration from <strong>Rails 4/5 → Rails 7 & Ruby 3.x</strong>, improving boot performance by 25%.</li>
-        <li>Resolved critical <strong>N+1 query issues</strong> reducing average API response time by ~35%.</li>
-        <li>Built <strong>RESTful Mobile APIs for Android & iOS</strong> driver apps with real-time delivery tracking.</li>
-        <li>Implemented cross-platform <strong>push notifications (FCM & APNs)</strong> via Sidekiq/Redis background queues.</li>
-        <li>Built one-click <strong>AWS deployment pipeline via Slack callback</strong> integrating GitHub Actions & ECS.</li>
-        <li>Integrated AWS S3 for delivery proof image storage with pre-signed URL access.</li>
-        <li>Mentored <strong>6 junior developers</strong>, conducted 300+ PR reviews.</li>
-      </ul>
-    </div>
-
-    <!-- Deqode -->
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-role">Senior Solutions Engineer</div>
-        <div class="exp-period">Jul 2021 – Jan 2024</div>
-      </div>
-      <div class="exp-company">Deqode Solutions</div>
-      <div class="exp-project">
-        <div class="exp-project-name">▸ RxVantage — Physician Platform</div>
-        <ul class="exp-bullets">
-          <li>Architected <strong>end-to-end GraphQL API</strong> with Apollo Server, schema stitching & field-level authorization.</li>
-          <li>Implemented complex <strong>RBAC & multi-tenant access models</strong> for physicians, reps and admins.</li>
-          <li>Resolved N+1 issues using <strong>DataLoader batching</strong>, reducing DB calls by 60%.</li>
-          <li>Ensured backward compatibility with GraphQL <strong>field deprecation & versioning strategies</strong>.</li>
-        </ul>
-      </div>
-      <div class="exp-project">
-        <div class="exp-project-name">▸ RenoFi — Smart Loan Financing</div>
-        <ul class="exp-bullets">
-          <li>Designed scalable microservices with <strong>Apollo Federation / GraphQL Gateway</strong>.</li>
-          <li>Integrated <strong>Google Cloud Pub/Sub</strong> for async event-driven loan processing workflows.</li>
-          <li>Implemented GraphQL caching reducing p95 latency by <strong>~45%</strong>.</li>
-          <li>Managed deployments via <strong>Heroku pipelines</strong> with zero-downtime release strategy.</li>
-          <li>Championed TDD/BDD — RSpec & Capybara coverage <strong>exceeded 90%</strong>.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Bestpeers -->
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-role">Solutions Engineer</div>
-        <div class="exp-period">Jan 2020 – Jun 2021</div>
-      </div>
-      <div class="exp-company">Bestpeers Infosystem Pvt. Ltd</div>
-      <div class="exp-project">
-        <div class="exp-project-name">▸ United Signals — Paperless Onboarding</div>
-        <ul class="exp-bullets">
-          <li>Led end-to-end releases across dev, staging & production with <strong>Capistrano CI/CD pipelines</strong>.</li>
-          <li>Integrated <strong>AWS S3</strong> for secure KYC document & digital signature storage.</li>
-          <li>Reduced post-release defects by <strong>~35%</strong> through systematic testing frameworks.</li>
-        </ul>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- HIGHLIGHTS -->
-<section style="background: var(--surface);" id="highlights">
-  <div class="section-label">Key Achievements</div>
-  <h2 class="section-title">What Sets Me Apart</h2>
-  <div class="highlights-grid">
-    <div class="highlight-card fade-in">
-      <div class="highlight-icon">⚡</div>
-      <div class="highlight-title">Performance Optimisation</div>
-      <div class="highlight-desc">Reduced Sidekiq background-job processing time by 40% and API response times by 35% through targeted N+1 query resolution and Redis queue tuning.</div>
-    </div>
-    <div class="highlight-card fade-in">
-      <div class="highlight-icon">🤖</div>
-      <div class="highlight-title">LLM Training & Evaluation</div>
-      <div class="highlight-desc">Recognised as Highest-Rated LLM Trainer at Turing. Benchmarked Claude, GPT-4, and Gemini across coding ability and STEM reasoning tasks.</div>
-    </div>
-    <div class="highlight-card fade-in">
-      <div class="highlight-icon">🏗️</div>
-      <div class="highlight-title">Rails Modernisation</div>
-      <div class="highlight-desc">Led full Rails 4/5 → Rails 7 & Ruby 3.x migration, eliminating deprecated dependencies and improving boot performance by 25%.</div>
-    </div>
-    <div class="highlight-card fade-in">
-      <div class="highlight-icon">📱</div>
-      <div class="highlight-title">Mobile API Development</div>
-      <div class="highlight-desc">Built RESTful APIs for Android & iOS driver apps with real-time tracking, proof-of-delivery capture, and push notifications via FCM & APNs.</div>
-    </div>
-    <div class="highlight-card fade-in">
-      <div class="highlight-icon">☁️</div>
-      <div class="highlight-title">One-Click AWS Deployment</div>
-      <div class="highlight-desc">Architected Slack-triggered ECS deployment pipeline integrating GitHub Actions, AWS ECR, and SNS — reducing deployment time from 20 mins to under 5.</div>
-    </div>
-    <div class="highlight-card fade-in">
-      <div class="highlight-icon">👥</div>
-      <div class="highlight-title">Team Leadership</div>
-      <div class="highlight-desc">Mentored 6 engineers, reviewed 300+ pull requests, and established coding standards across DRY, thin controllers, and service-oriented architecture.</div>
-    </div>
-  </div>
-
-  <!-- Awards -->
-  <div style="margin-top: 3rem;" class="fade-in">
-    <div class="section-label" style="margin-bottom: 1.5rem;">Recognition</div>
-    <div class="awards-row">
-      <div class="award-pill">
-        <div class="award-icon">🏆</div>
-        <div class="award-text">
-          <strong>Highest-Rated LLM Trainer — Turing (2025–26)</strong>
-          Recognised for performance excellence across evaluation and training cycles.
-        </div>
-      </div>
-      <div class="award-pill">
-        <div class="award-icon">⭐</div>
-        <div class="award-text">
-          <strong>Top Performer Award</strong>
-          Delivered quality projects consistently ahead of schedule with minimal post-release defects.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section class="contact-section" id="contact">
-  <div class="section-label" style="justify-content: center;">Let's Connect</div>
-  <h2 class="section-title" style="margin-bottom: 1rem;">Get In Touch</h2>
-  <p style="color: var(--muted); font-size: 0.95rem; max-width: 460px; margin: 0 auto;">
-    Open to senior Rails roles, remote opportunities, and relocating with work visa sponsorship.
-  </p>
-  <div class="contact-links">
-    <a href="mailto:raksha.ramteke98@gmail.com" class="contact-link">✉ raksha.ramteke98@gmail.com</a>
-    <a href="tel:+917000584733" class="contact-link">📞 +91 70005 84733</a>
-    <a href="https://linkedin.com/in/raksha-ramteke-2900a5152" target="_blank" class="contact-link">in LinkedIn</a>
-    <a href="https://github.com/Raksha22" target="_blank" class="contact-link">⌥ GitHub</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 Raksha Ramteke — Senior Ruby on Rails Developer</p>
-  <p>Built with precision · Indore, India</p>
-</footer>
-
-<script>
-  // Fade in on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => {
-          entry.target.classList.add('visible');
-        }, 100);
-        observer.unobserve(entry.target);
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Add these lines inside your <head> tag -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png" />
+    <meta name="theme-color" content="#CC0000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raksha Ramteke — Senior Ruby on Rails Developer</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --surface: #111118;
+        --surface2: #1a1a24;
+        --accent: #6c63ff;
+        --accent2: #ff6b6b;
+        --accent3: #43e97b;
+        --text:hsl(240, 76.30%, 41.40%);
+        --muted: #6b6b80;
+        --border: rgba(43, 36, 180, 0.15);
+        --glow: rgba(108, 99, 255, 0.3);
       }
-    });
-  }, { threshold: 0.1 });
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  // Stagger hero elements
-  document.querySelectorAll('.hero .fade-in, .hero-stats .fade-in').forEach((el, i) => {
-    setTimeout(() => el.classList.add('visible'), 200 + i * 150);
-  });
-</script>
-</body>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-weight: 300;
+        line-height: 1.7;
+        overflow-x: hidden;
+      }
+
+      /* Noise texture overlay */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0.4;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 1.2rem 4rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(10, 10, 15, 0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .nav-logo span {
+        color: var(--accent);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2.5rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-decoration: none;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      /* HERO */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 8rem 4rem 4rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-bg {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 60% 40%,
+            rgba(108, 99, 255, 0.08) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 40% 40% at 20% 80%,
+            rgba(67, 233, 123, 0.05) 0%,
+            transparent 50%
+          );
+      }
+
+      .hero-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(108, 99, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(108, 99, 255, 0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+      }
+
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        color: var(--accent);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+        padding: 0.4rem 1rem;
+        border: 1px solid rgba(108, 99, 255, 0.3);
+        border-radius: 2rem;
+        background: rgba(108, 99, 255, 0.05);
+      }
+
+      .hero-tag::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent3);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.8);
+        }
+      }
+
+      .hero-name {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(3rem, 8vw, 6.5rem);
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero-name .line2 {
+        display: block;
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgba(108, 99, 255, 0.5);
+      }
+
+      .hero-title {
+        font-family: "DM Mono", monospace;
+        font-size: 1rem;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+        letter-spacing: 0.05em;
+      }
+
+      .hero-desc {
+        font-size: 1.05rem;
+        color: var(--muted);
+        max-width: 580px;
+        line-height: 1.8;
+        margin-bottom: 3rem;
+      }
+
+      .hero-desc strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .hero-cta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 2rem;
+        background: var(--accent);
+        color: #fff;
+        font-family: "DM Mono", monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(108, 99, 255, 0.4);
+      }
+
+      .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 2rem;
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+
+      .btn-outline:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      .hero-stats {
+        position: absolute;
+        right: 4rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        z-index: 2;
+      }
+
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        min-width: 140px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+      }
+
+      .stat-num {
+        font-family: "Syne", sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 0.3rem;
+      }
+
+      .stat-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      /* SECTIONS */
+      section {
+        padding: 6rem 4rem;
+      }
+
+      .section-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--accent);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .section-label::after {
+        content: "";
+        flex: 1;
+        max-width: 60px;
+        height: 1px;
+        background: var(--accent);
+        opacity: 0.3;
+      }
+
+      .section-title {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 3rem;
+        line-height: 1.1;
+      }
+
+      /* SKILLS */
+      .skills-section {
+        background: var(--surface);
+      }
+
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .skill-group {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.8rem;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      .skill-group:hover {
+        border-color: rgba(108, 99, 255, 0.4);
+        transform: translateY(-3px);
+      }
+
+      .skill-group-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--accent);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+
+      .skill-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .skill-tag {
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 4px;
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        letter-spacing: 0.03em;
+      }
+
+      /* EXPERIENCE */
+      .exp-timeline {
+        position: relative;
+      }
+
+      .exp-timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(to bottom, var(--accent), transparent);
+        opacity: 0.2;
+      }
+
+      .exp-item {
+        padding-left: 2.5rem;
+        margin-bottom: 4rem;
+        position: relative;
+      }
+
+      .exp-item::before {
+        content: "";
+        position: absolute;
+        left: -4px;
+        top: 8px;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2px solid var(--bg);
+        box-shadow: 0 0 12px var(--glow);
+      }
+
+      .exp-meta {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+      }
+
+      .exp-role {
+        font-family: "Syne", sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .exp-period {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--accent);
+        padding: 0.25rem 0.75rem;
+        border: 1px solid rgba(108, 99, 255, 0.2);
+        border-radius: 2rem;
+        white-space: nowrap;
+      }
+
+      .exp-company {
+        font-family: "DM Mono", monospace;
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-bottom: 1.2rem;
+      }
+
+      .exp-project {
+        margin-bottom: 1.2rem;
+      }
+
+      .exp-project-name {
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--accent2);
+        letter-spacing: 0.08em;
+        margin-bottom: 0.6rem;
+        text-transform: uppercase;
+      }
+
+      .exp-bullets {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .exp-bullets li {
+        font-size: 0.9rem;
+        color: var(--muted);
+        padding-left: 1.2rem;
+        position: relative;
+        line-height: 1.6;
+      }
+
+      .exp-bullets li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-size: 0.75rem;
+      }
+
+      .exp-bullets li strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* HIGHLIGHTS */
+      .highlights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .highlight-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+      }
+
+      .highlight-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(108, 99, 255, 0.4);
+      }
+
+      .highlight-card::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, var(--glow), transparent 70%);
+        border-radius: 50%;
+      }
+
+      .highlight-icon {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .highlight-title {
+        font-family: "Syne", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .highlight-desc {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      /* CONTACT */
+      .contact-section {
+        background: var(--surface);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .contact-section::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(108, 99, 255, 0.06),
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+
+      .contact-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 2.5rem;
+        position: relative;
+      }
+
+      .contact-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.85rem 1.8rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        text-decoration: none;
+        font-family: "DM Mono", monospace;
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        background: var(--bg);
+      }
+
+      .contact-link:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(108, 99, 255, 0.15);
+      }
+
+      /* AWARDS */
+      .awards-row {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .award-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        flex: 1;
+        min-width: 260px;
+      }
+
+      .award-icon {
+        font-size: 1.5rem;
+      }
+
+      .award-text {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .award-text strong {
+        color: var(--text);
+        font-weight: 500;
+        display: block;
+      }
+
+      /* FADE IN */
+      .fade-in {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+      .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* FOOTER */
+      footer {
+        padding: 2rem 4rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      footer p {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+
+      @media (max-width: 768px) {
+        nav {
+          padding: 1rem 1.5rem;
+        }
+        .nav-links {
+          display: none;
+        }
+        .hero {
+          padding: 7rem 1.5rem 3rem;
+        }
+        .hero-stats {
+          display: none;
+        }
+        section {
+          padding: 4rem 1.5rem;
+        }
+        footer {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a href="#" class="nav-logo">RR<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#highlights">Highlights</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="about">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
+
+      <div class="hero-content fade-in">
+        <div class="hero-tag">Available for opportunities</div>
+        <h1 class="hero-name">
+          Raksha<br />
+          <span class="line2">Ramteke</span>
+        </h1>
+        <p class="hero-title">// Senior Ruby on Rails Developer</p>
+        <p class="hero-desc">
+          <strong>6+ years</strong> building production-grade web applications
+          at scale. Deep expertise in
+          <strong>REST APIs, GraphQL, Docker, PostgreSQL & Redis</strong>.
+          Proven track record in microservices, CI/CD pipelines, and TDD/BDD
+          workflows. Hands-on LLM trainer for
+          <strong>Claude, GPT-4 & Gemini</strong> via Turing.
+        </p>
+        <div class="hero-cta">
+          <a href="mailto:raksha.ramteke98@gmail.com" class="btn-primary"
+            >↗ Get in Touch</a
+          >
+          <a
+            href="https://linkedin.com/in/raksha-ramteke-2900a5152"
+            target="_blank"
+            class="btn-outline"
+            >LinkedIn</a
+          >
+          <a
+            href="https://github.com/Raksha22"
+            target="_blank"
+            class="btn-outline"
+            >GitHub</a
+          >
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-card fade-in">
+          <div class="stat-num">6+</div>
+          <div class="stat-label">Years Exp</div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="stat-num">40%</div>
+          <div class="stat-label">Sidekiq Optimised</div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="stat-num">300+</div>
+          <div class="stat-label">PRs Reviewed</div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="stat-num">90%+</div>
+          <div class="stat-label">Test Coverage</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="skills-section" id="skills">
+      <div class="section-label">Technical Stack</div>
+      <h2 class="section-title">What I Work With</h2>
+      <div class="skills-grid">
+        <div class="skill-group fade-in">
+          <div class="skill-group-label">Languages & Frameworks</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Ruby on Rails</span>
+            <span class="skill-tag">Ruby</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">TypeScript</span>
+            <span class="skill-tag">Angular</span>
+            <span class="skill-tag">jQuery</span>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-label">APIs & Integration</div>
+          <div class="skill-tags">
+            <span class="skill-tag">GraphQL</span>
+            <span class="skill-tag">REST APIs</span>
+            <span class="skill-tag">Twilio</span>
+            <span class="skill-tag">Google Maps</span>
+            <span class="skill-tag">Google Pub/Sub</span>
+            <span class="skill-tag">FCM</span>
+            <span class="skill-tag">APNs</span>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-label">Databases</div>
+          <div class="skill-tags">
+            <span class="skill-tag">PostgreSQL</span>
+            <span class="skill-tag">MySQL</span>
+            <span class="skill-tag">SQLite</span>
+            <span class="skill-tag">Redis</span>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-label">DevOps & Cloud</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">AWS ECS</span>
+            <span class="skill-tag">AWS S3</span>
+            <span class="skill-tag">ECR</span>
+            <span class="skill-tag">GitHub Actions</span>
+            <span class="skill-tag">Heroku</span>
+            <span class="skill-tag">Capistrano</span>
+            <span class="skill-tag">CI/CD</span>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-label">Testing</div>
+          <div class="skill-tags">
+            <span class="skill-tag">RSpec</span>
+            <span class="skill-tag">Capybara</span>
+            <span class="skill-tag">TDD</span>
+            <span class="skill-tag">BDD</span>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-label">Architecture</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Microservices</span>
+            <span class="skill-tag">API-First Design</span>
+            <span class="skill-tag">RBAC</span>
+            <span class="skill-tag">Multi-Tenant</span>
+            <span class="skill-tag">Sidekiq</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <div class="section-label">Career</div>
+      <h2 class="section-title">Experience</h2>
+      <div class="exp-timeline">
+        <!-- Turing -->
+        <div class="exp-item fade-in">
+          <div class="exp-meta">
+            <div class="exp-role">Senior Software Developer</div>
+            <div class="exp-period">Jul 2025 – Mar 2026</div>
+          </div>
+          <div class="exp-company">
+            Giantsminds Solutions (Client: Turing — LLM R&D) · Dallas, USA
+          </div>
+          <ul class="exp-bullets">
+            <li>
+              Served as <strong>POD Lead & LLM Trainer</strong> benchmarking
+              Claude, GPT-4, and Gemini for coding ability and STEM reasoning.
+            </li>
+            <li>
+              Designed bug-injection tasks across
+              <strong>50+ GitHub repositories</strong> to advance model
+              capabilities.
+            </li>
+            <li>
+              Built validation tooling in Rails reducing manual QA overhead by
+              <strong>~30%</strong>.
+            </li>
+            <li>
+              Recognised as <strong>Highest-Rated LLM Trainer</strong> for
+              evaluation quality and throughput.
+            </li>
+            <li>
+              Led peer code reviews and managed TAIGA task board for a team of 6
+              trainers.
+            </li>
+          </ul>
+        </div>
+
+        <!-- DispatchTrack -->
+        <div class="exp-item fade-in">
+          <div class="exp-meta">
+            <div class="exp-role">Senior Full Stack Developer</div>
+            <div class="exp-period">Feb 2024 – Jun 2025</div>
+          </div>
+          <div class="exp-company">
+            DispatchTrack India Pvt. Ltd · Hyderabad, IN
+          </div>
+          <ul class="exp-bullets">
+            <li>
+              Owned full-stack development of a last-mile delivery SaaS platform
+              serving <strong>high-throughput logistics operations</strong> at
+              scale.
+            </li>
+            <li>
+              Optimised Sidekiq pipeline cutting processing time by
+              <strong>40%</strong> via job batching, Redis tuning & concurrency
+              config.
+            </li>
+            <li>
+              Led migration from
+              <strong>Rails 4/5 → Rails 7 & Ruby 3.x</strong>, improving boot
+              performance by 25%.
+            </li>
+            <li>
+              Resolved critical <strong>N+1 query issues</strong> reducing
+              average API response time by ~35%.
+            </li>
+            <li>
+              Built
+              <strong>RESTful Mobile APIs for Android & iOS</strong> driver apps
+              with real-time delivery tracking.
+            </li>
+            <li>
+              Implemented cross-platform
+              <strong>push notifications (FCM & APNs)</strong> via Sidekiq/Redis
+              background queues.
+            </li>
+            <li>
+              Built one-click
+              <strong>AWS deployment pipeline via Slack callback</strong>
+              integrating GitHub Actions & ECS.
+            </li>
+            <li>
+              Integrated AWS S3 for delivery proof image storage with pre-signed
+              URL access.
+            </li>
+            <li>
+              Mentored <strong>6 junior developers</strong>, conducted 300+ PR
+              reviews.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Deqode -->
+        <div class="exp-item fade-in">
+          <div class="exp-meta">
+            <div class="exp-role">Senior Solutions Engineer</div>
+            <div class="exp-period">Jul 2021 – Jan 2024</div>
+          </div>
+          <div class="exp-company">Deqode Solutions</div>
+          <div class="exp-project">
+            <div class="exp-project-name">▸ RxVantage — Physician Platform</div>
+            <ul class="exp-bullets">
+              <li>
+                Architected <strong>end-to-end GraphQL API</strong> with Apollo
+                Server, schema stitching & field-level authorization.
+              </li>
+              <li>
+                Implemented complex
+                <strong>RBAC & multi-tenant access models</strong> for
+                physicians, reps and admins.
+              </li>
+              <li>
+                Resolved N+1 issues using <strong>DataLoader batching</strong>,
+                reducing DB calls by 60%.
+              </li>
+              <li>
+                Ensured backward compatibility with GraphQL
+                <strong>field deprecation & versioning strategies</strong>.
+              </li>
+            </ul>
+          </div>
+          <div class="exp-project">
+            <div class="exp-project-name">▸ RenoFi — Smart Loan Financing</div>
+            <ul class="exp-bullets">
+              <li>
+                Designed scalable microservices with
+                <strong>Apollo Federation / GraphQL Gateway</strong>.
+              </li>
+              <li>
+                Integrated <strong>Google Cloud Pub/Sub</strong> for async
+                event-driven loan processing workflows.
+              </li>
+              <li>
+                Implemented GraphQL caching reducing p95 latency by
+                <strong>~45%</strong>.
+              </li>
+              <li>
+                Managed deployments via <strong>Heroku pipelines</strong> with
+                zero-downtime release strategy.
+              </li>
+              <li>
+                Championed TDD/BDD — RSpec & Capybara coverage
+                <strong>exceeded 90%</strong>.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bestpeers -->
+        <div class="exp-item fade-in">
+          <div class="exp-meta">
+            <div class="exp-role">Solutions Engineer</div>
+            <div class="exp-period">Jan 2020 – Jun 2021</div>
+          </div>
+          <div class="exp-company">Bestpeers Infosystem Pvt. Ltd</div>
+          <div class="exp-project">
+            <div class="exp-project-name">
+              ▸ United Signals — Paperless Onboarding
+            </div>
+            <ul class="exp-bullets">
+              <li>
+                Led end-to-end releases across dev, staging & production with
+                <strong>Capistrano CI/CD pipelines</strong>.
+              </li>
+              <li>
+                Integrated <strong>AWS S3</strong> for secure KYC document &
+                digital signature storage.
+              </li>
+              <li>
+                Reduced post-release defects by <strong>~35%</strong> through
+                systematic testing frameworks.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section style="background: var(--surface)" id="highlights">
+      <div class="section-label">Key Achievements</div>
+      <h2 class="section-title">What Sets Me Apart</h2>
+      <div class="highlights-grid">
+        <div class="highlight-card fade-in">
+          <div class="highlight-icon">⚡</div>
+          <div class="highlight-title">Performance Optimisation</div>
+          <div class="highlight-desc">
+            Reduced Sidekiq background-job processing time by 40% and API
+            response times by 35% through targeted N+1 query resolution and
+            Redis queue tuning.
+          </div>
+        </div>
+        <div class="highlight-card fade-in">
+          <div class="highlight-icon">🤖</div>
+          <div class="highlight-title">LLM Training & Evaluation</div>
+          <div class="highlight-desc">
+            Recognised as Highest-Rated LLM Trainer at Turing. Benchmarked
+            Claude, GPT-4, and Gemini across coding ability and STEM reasoning
+            tasks.
+          </div>
+        </div>
+        <div class="highlight-card fade-in">
+          <div class="highlight-icon">🏗️</div>
+          <div class="highlight-title">Rails Modernisation</div>
+          <div class="highlight-desc">
+            Led full Rails 4/5 → Rails 7 & Ruby 3.x migration, eliminating
+            deprecated dependencies and improving boot performance by 25%.
+          </div>
+        </div>
+        <div class="highlight-card fade-in">
+          <div class="highlight-icon">📱</div>
+          <div class="highlight-title">Mobile API Development</div>
+          <div class="highlight-desc">
+            Built RESTful APIs for Android & iOS driver apps with real-time
+            tracking, proof-of-delivery capture, and push notifications via FCM
+            & APNs.
+          </div>
+        </div>
+        <div class="highlight-card fade-in">
+          <div class="highlight-icon">☁️</div>
+          <div class="highlight-title">One-Click AWS Deployment</div>
+          <div class="highlight-desc">
+            Architected Slack-triggered ECS deployment pipeline integrating
+            GitHub Actions, AWS ECR, and SNS — reducing deployment time from 20
+            mins to under 5.
+          </div>
+        </div>
+        <div class="highlight-card fade-in">
+          <div class="highlight-icon">👥</div>
+          <div class="highlight-title">Team Leadership</div>
+          <div class="highlight-desc">
+            Mentored 6 engineers, reviewed 300+ pull requests, and established
+            coding standards across DRY, thin controllers, and service-oriented
+            architecture.
+          </div>
+        </div>
+      </div>
+
+      <!-- Awards -->
+      <div style="margin-top: 3rem" class="fade-in">
+        <div class="section-label" style="margin-bottom: 1.5rem">
+          Recognition
+        </div>
+        <div class="awards-row">
+          <div class="award-pill">
+            <div class="award-icon">🏆</div>
+            <div class="award-text">
+              <strong>Highest-Rated LLM Trainer — Turing (2025–26)</strong>
+              Recognised for performance excellence across evaluation and
+              training cycles.
+            </div>
+          </div>
+          <div class="award-pill">
+            <div class="award-icon">⭐</div>
+            <div class="award-text">
+              <strong>Top Performer Award</strong>
+              Delivered quality projects consistently ahead of schedule with
+              minimal post-release defects.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact-section" id="contact">
+      <div class="section-label" style="justify-content: center">
+        Let's Connect
+      </div>
+      <h2 class="section-title" style="margin-bottom: 1rem">Get In Touch</h2>
+      <p
+        style="
+          color: var(--muted);
+          font-size: 0.95rem;
+          max-width: 460px;
+          margin: 0 auto;
+        "
+      >
+        Open to senior Rails roles, remote opportunities, and relocating with
+        work visa sponsorship.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:raksha.ramteke98@gmail.com" class="contact-link"
+          >✉ raksha.ramteke98@gmail.com</a
+        >
+        <a href="tel:+917000584733" class="contact-link">📞 +91 70005 84733</a>
+        <a
+          href="https://linkedin.com/in/raksha-ramteke-2900a5152"
+          target="_blank"
+          class="contact-link"
+          >in LinkedIn</a
+        >
+        <a
+          href="https://github.com/Raksha22"
+          target="_blank"
+          class="contact-link"
+          >⌥ GitHub</a
+        >
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2026 Raksha Ramteke — Senior Ruby on Rails Developer</p>
+      <p>Built with precision · Indore, India</p>
+    </footer>
+
+    <script>
+      // Fade in on scroll
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add("visible");
+              }, 100);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+
+      document
+        .querySelectorAll(".fade-in")
+        .forEach((el) => observer.observe(el));
+
+      // Stagger hero elements
+      document
+        .querySelectorAll(".hero .fade-in, .hero-stats .fade-in")
+        .forEach((el, i) => {
+          setTimeout(() => el.classList.add("visible"), 200 + i * 150);
+        });
+    </script>
+  </body>
 </html>
